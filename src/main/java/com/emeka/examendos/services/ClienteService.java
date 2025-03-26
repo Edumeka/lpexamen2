@@ -57,24 +57,41 @@ public class ClienteService {
                 this.prestamoRepository.save(nuevoPrestamo);
 
 
-                Cuota nuevaCuota = new Cuota();          
-                nuevaCuota.setMes(0); 
-                nuevaCuota.setInteres(0); 
-                nuevaCuota.setSaldo(nuevoPrestamo.getMonto());
-                double saldoAnterior= nuevoPrestamo.getMonto();
-                double capitalAnterior=cuota;
-                cuotaRepository.save(nuevaCuota);
-                for (int i = 1; i <= nuevoPrestamo.getPlazo(); i++) {  
-                    Cuota nvCuota = new Cuota();          
-                    nvCuota.setMes(i); 
-                    saldoAnterior-=saldoAnterior;
-                    double interes=(saldoAnterior*(nuevoPrestamo.getInteres()/12));
-                    capitalAnterior-=(capitalAnterior-interes);
-                    nvCuota.setInteres(interes); 
-                    nvCuota.setCapital(capitalAnterior);
-                    nvCuota.setSaldo(saldoAnterior);   
-                    cuotaRepository.save(nvCuota);
-                }
+            
+Cuota nuevaCuota = new Cuota();          
+nuevaCuota.setMes(0); 
+nuevaCuota.setInteres(0); 
+nuevaCuota.setSaldo(nuevoPrestamo.getMonto()); 
+double saldoAnterior = nuevoPrestamo.getMonto();
+
+double capitalAnterior = nuevoPrestamo.getMonto(); 
+nuevaCuota.setPrestamo(nuevoPrestamo);
+cuotaRepository.save(nuevaCuota);
+
+
+for (int i = 1; i <= nuevoPrestamo.getPlazo(); i++) {  
+    Cuota nvCuota = new Cuota();
+    
+    nvCuota.setMes(i); 
+    
+   
+    double interes = saldoAnterior * (nuevoPrestamo.getInteres() / 12);
+    nvCuota.setInteres(interes);
+    
+   
+    double capital = cuota - interes; 
+    nvCuota.setCapital(capital);
+    
+   
+    saldoAnterior -= capital; 
+    
+    
+    nvCuota.setSaldo(saldoAnterior);
+    nvCuota.setPrestamo(nuevoPrestamo);
+    
+    cuotaRepository.save(nvCuota);
+}
+
 
              
                 
